@@ -1,3 +1,5 @@
+var webpack = require('webpack');
+
 module.exports = {
   entry: [
     'webpack-dev-server/client?http://localhost:8080',
@@ -5,10 +7,21 @@ module.exports = {
     './src/index.js'
   ],
   module: {
+    preLoaders: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: "eslint-loader"
+      },
+    ],
     loaders: [{
       test: /\.jsx?$/,
       exclude: /node_modules/,
       loader: 'react-hot!babel'
+    },
+    {
+      test: /\.scss$/,
+      loader: 'style!css!sass'
     }]
   },
   resolve: {
@@ -21,6 +34,20 @@ module.exports = {
   },
   devServer: {
     contentBase: './dist',
-    hot: true
-  }
+    hot: true,
+    historyApiFallback: true
+  },
+  eslint: {
+    configFile: './.eslintrc'
+  },
+  plugins: [
+    new webpack.ProvidePlugin({
+      'fetch': 'imports?this=>global!exports?global.fetch!whatwg-fetch'
+    }),
+    new webpack.DefinePlugin({
+      'process.env': {
+        'NODE_ENV': '"development"'
+      }
+    })
+  ]
 };
